@@ -8,52 +8,98 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
 from sklearn.model_selection import train_test_split
 import pickle
 
+class CreditDataProcessor:
+    def __init__(self, file_path):
+        self.file_path = file_path
+        self.base_credit = None
+        self.x_credit = None
+        self.y_credit = None
+        self.scale_credit = StandardScaler()
+        self.X_credit_treinamento = None
+        self.X_credit_teste = None
+        self.Y_credit_treinamento = None
+        self.Y_credit_teste = None
+    
+    def load_data(self):
+        # Carregar arquivo CSV
+        self.base_credit = pd.read_csv(self.file_path)
 
-#abre o csv
-base_credit = pd.read_csv('/Users/felip/PycharmProjects/MA e Data/basededados/credit_data.csv')
-#localiza na coluna age do csv onde tem valores menores que 0 e subistitue pela media
-base_credit.loc[base_credit['age'] < 0, 'age'] = 40.92
-#filtra na coluna age valores sem preencher e coloca no lugar a media da coluna
-base_credit.fillna(base_credit['age'].mean(), inplace = True)
+    def preprocess_data(self):
+        # Lidar com valores ausentes e inválidos no database.
+        # Substituir os valores negativos de idade pela idade média
+        self.base_credit.loc[self.base_credit['age'] < 0, 'age'] = 40.92
+        # Preencher os valores de idade ausentes com a idade média
+        self.base_credit.fillna(self.base_credit['age'].mean(), inplace=True)
+        # Dividir em variáveis ​​preditivas (X) e alvo (y)
+        self.x_credit = self.base_credit.iloc[:, 1:4].values
+        self.y_credit = self.base_credit.iloc[:, 4].values
+        # Dimensionar as variáveis ​​preditivas
+        self.x_credit = self.scale_credit.fit_transform(self.x_credit)
+        
+    def show_base_credit(self):
+        if self.base_credit is not None:
+            print(self.base_credit)
+        else:
+            print("Base de dados ainda não carregada ou processada. Use `load_data` e `preprocess_data` primeiro.")
 
-#separa a base em 2, uma para os valores preditivos sendo a x e a y para a previsao respondida
-x_credit = base_credit.iloc[:,1:4].values
-y_credit = base_credit.iloc[:,4].values
+    def show_default_counts(self, column):
+        #Exibe os valores únicos da coluna e suas respectivas contagens.
+        if self.base_credit is not None:
+            unique_values, counts = np.unique(self.base_credit[{column}], return_counts=True)
+            print(f"Valores únicos e contagens na coluna {column}:")
+            for value, count in zip(unique_values, counts):
+                print(f"  Valor: {value}, Contagem: {count}")
+        else:
+            print("Base de dados ainda não carregada. Use `load_data` primeiro.")
+    
+    def split_data(self, test_size=0.25, random_state=0):
+        #divide a base em x teste e treinamento e y teste e treinamento
+        self.X_credit_treinamento, self.X_credit_teste, self.Y_credit_treinamento, self.Y_credit_teste = train_test_split(
+            self.x_credit, self.y_credit, test_size=test_size, random_state=random_state
+        )
+        
+    def save_data(self, filename='credit.pkl'):
+        #salva a variavel em um arquivo .pkl
+        with open(filename, mode='wb') as f:
+            pickle.dump([self.X_credit_treinamento, self.X_credit_teste, self.Y_credit_treinamento, self.Y_credit_teste], f)
+    
+    def plot_default_count(self):
+        # Grafico para contagem de casos padrão
+        sns.countplot(x=self.base_credit['default'])
+        plt.show()
+        
+    def plot_age_histogram(self):
+        # Grafico histograma da coluna de idade
+        plt.hist(x=self.base_credit['age'])
+        plt.show()
 
-#armazena a classe standardscaler
-scale_credit = StandardScaler()
-# usa a classe standardscaler para ajustar os valores na mesma escala
-x_credit = scale_credit.fit_transform(x_credit)
-#print(base_credit)
-#print(np.unique(base_credit['default'], return_counts= True))
-def grafic_default(): # gera e abre janela do grafico
-    sns.countplot(x=base_credit['default'])
-    plt.show()
+    def plot_scatter_matrix(self):
+        # Grafico age, income, loan
+        grafico = px.scatter_matrix(
+            self.base_credit, dimensions=['age', 'income', 'loan'], color='default'
+        )
+        grafico.show()
+    
+if __name__ == "__main__":
+    #Importar database
+    processor = CreditDataProcessor('./basededados/credit_data.csv')
+    #Carregar os dados
+    processor.load_data()
+    #preprocessar os dados
+    processor.preprocess_data()
+    #Mostrar os dados preprocessados
+    # processor.show_base_credit()
+    #Mostrar valores únicos e contagens da coluna 'default'
+    # processor.show_default_counts(column="default")
+    
+    processor.split_data()
+    processor.save_data()
+    
+    # Gera gráficos
+    processor.plot_default_count()
+    processor.plot_age_histogram()
+    processor.plot_scatter_matrix()
+        
 
-#divide a base em x teste e treinamento e y teste e treinamento
-X_credit_treinamento, X_credit_teste, Y_credit_treinamento, Y_credit_teste = train_test_split(x_credit, y_credit, test_size=0.25, random_state=0)
-
-#salva a variavel em um arquivo .pkl
-with open('credit.pkl', mode='wb') as f:
-    pickle.dump([X_credit_treinamento, X_credit_teste, Y_credit_treinamento, Y_credit_teste], f)
-
-
-#graficos
-plt.hist(x = base_credit['age'])
-#plt.show()
-
-""""base_credit2 = base_credit.drop(base_credit[base_credit['age'] < 0].index)
-variavel que recebe a basecredit.drop(passando a basecredit[na posicao age
-e filtrando as que sao menores que  0, assim pegamos o indice com o .index e passamos para o
-.drop a lista com os indices para ele apagar
-print(base_credit2)"""
-
-grafico = px.scatter_matrix(base_credit, dimensions=['age','income','loan'], color = 'default' )
-#grafico.show()
-#print(base_credit.loc[base_credit['age'] < 0])
-#print(base_credit.head(33))
-#print(a)
-#print(base_credit.loc[base_credit['clientid'].isin([29, 31, 32])])
-#print(x_credit)
 
 
