@@ -1,0 +1,22 @@
+# Ignorar o arquivo .DS_Store (usado pelo macOS)
+.DS_Store
+
+# Ignorar a pasta node_modules (comum em projetos Node.js)
+node_modules/
+
+# Ignorar arquivos de log
+*.log
+
+# Ignorar pastas do Python, como ambientes virtuais
+venv/
+__pycache__/
+
+# Ignorar pastas e arquivos de configurações de IDE, como o Visual Studio Code
+.vscode/
+
+# Ignorar arquivos de backup do editor (exemplo: arquivos com ~ no final)
+*~
+
+# Ignorar pastas e arquivos de build (exemplo: Java)
+build/
+
