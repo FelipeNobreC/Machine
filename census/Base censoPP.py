@@ -61,7 +61,7 @@ class CensusDataProcessor:
 
 if __name__ == "__main__":
     # Criação do objeto e processamento
-    processor = CensusDataProcessor(file_path='./basededados/census.csv')
+    processor = CensusDataProcessor(file_path='/Users/felip/PycharmProjects/Machine/basededados/census.csv')
 
     # Carregar e processar dados
     processor.carregar_dados()
@@ -70,16 +70,16 @@ if __name__ == "__main__":
     processor.escalonar_dados()
 
     # Divisão dos dados
-    X_treino, X_teste, y_treino, y_teste = processor.dividir_dados()
+    X_census_treino, X_census_teste, y_census_treino, y_census_teste = processor.dividir_dados()
 
     # Exibir formas dos dados
-    print("Treinamento (X):", X_treino.shape)
-    print("Teste (X):", X_teste.shape)
-    print("Treinamento (y):", y_treino.shape)
-    print("Teste (y):", y_teste.shape)
+    print("Treinamento (X):", X_census_treino.shape)
+    print("Teste (X):", X_census_teste.shape)
+    print("Treinamento (y):", y_census_treino.shape)
+    print("Teste (y):", y_census_teste.shape)
 
     # Salvar dados processados
-    processor.salvar_dados_processados('census.pkl', [X_teste, X_treino, y_teste, y_treino])
+    processor.salvar_dados_processados('census.pkl', [X_census_teste, X_census_treino, y_census_teste, y_census_treino])
 
     # Gerar gráfico treemap
     processor.gerar_grafico_treemap()

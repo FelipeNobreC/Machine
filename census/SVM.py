@@ -8,31 +8,31 @@ class CensusClassifier:
     def __init__(self, model_path):
         # Inicializa o classificador com o caminho do modelo salvo e os dados.
         self.model_path = model_path
-        self.X_train = None
-        self.X_test = None
-        self.y_train = None
-        self.y_test = None
+        self.X_census_treino = None
+        self.X_census_teste = None
+        self.y_census_treino = None
+        self.y_census_teste = None
         self.svm = None
 
     def carregar_dados(self):
         # Carrega os dados processados salvos em um arquivo pickle.
         with open(self.model_path, 'rb') as f:
-            self.X_train, self.X_test, self.y_train, self.y_test = pickle.load(f)
+            self.X_census_treino, self.X_census_teste, self.y_census_treino, self.y_census_teste = pickle.load(f)
         
         # Garante que y_train está no formato correto
-        self.y_train = self.y_train.ravel()
+        self.y_census_treino = self.y_census_treino.ravel()
 
     def treinar_modelo(self, kernel='linear', random_state=1):
         # Treina o modelo SVM com os dados de treinamento.
         self.svm = SVC(kernel=kernel, random_state=random_state)
-        self.svm.fit(self.X_train, self.y_train)
+        self.svm.fit(self.X_census_treino, self.y_census_treino)
 
     def avaliar_modelo(self):
         # Avalia o modelo com os dados de teste.
-        previsoes = self.svm.predict(self.X_test)
+        previsoes = self.svm.predict(self.X_census_teste)
         print(previsoes)
-        print(accuracy_score(self.y_test, previsoes))
-        print(classification_report(self.y_test, previsoes))
+        print(accuracy_score(self.y_census_teste, previsoes))
+        print(classification_report(self.y_census_teste, previsoes))
 
     def consultar(self, *valores):
         # Faz previsões para novos dados fornecidos.
@@ -43,7 +43,7 @@ class CensusClassifier:
 
 if __name__ == "__main__":
     # Instancia o classificador
-    classifier = CensusClassifier(model_path='./census/census.pkl')
+    classifier = CensusClassifier(model_path='/Users/felip/PycharmProjects/Machine/census/census.pkl')
 
     # Carregar dados
     classifier.carregar_dados()

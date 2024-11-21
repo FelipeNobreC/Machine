@@ -2,9 +2,8 @@ from sklearn.neural_network import MLPClassifier
 import pickle
 from sklearn.metrics import accuracy_score, classification_report
 import numpy as np
-from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
-from census.SVM import X_census_treinamento
-from credit.BaseCreditPP import x_credit
+from sklearn.preprocessing import StandardScaler
+
 
 class RedeNeuralCredit:
     def __init__(self, model_path):
@@ -32,6 +31,7 @@ class RedeNeuralCredit:
     def evaluate_model(self):
         # Avalia o modelo com os dados de teste.
         predictions = self.rede_neural.predict(self.X_test)
+        print(predictions)
         accuracy = accuracy_score(self.y_test, predictions)
         print(f"Accuracy: {accuracy}")
         print("Relatório de Classificação:")
@@ -57,8 +57,11 @@ class RedeNeuralCredit:
         prediction = self.rede_neural.predict(scaled_input) # Previssao do modelo de rede neural
         print("Previsão para os dados fornecidos:", prediction)
 
+    def generic(self):
+        pass
+
 if __name__ == "__main__":
-    model_path = './credit/credit.pkl'
+    model_path = '/Users/felip/PycharmProjects/Machine/credit/credit.pkl'
     credit_nn = RedeNeuralCredit(model_path)
 
     # Treinar e avaliar o modelo
@@ -67,3 +70,5 @@ if __name__ == "__main__":
 
     # Prever dados fornecidos pelo usuário
     credit_nn.predict_user_input()
+
+
