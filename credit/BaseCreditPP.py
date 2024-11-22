@@ -82,7 +82,7 @@ class CreditDataProcessor:
     
 if __name__ == "__main__":
     #Importar database
-    processor = CreditDataProcessor('./basededados/credit_data.csv')
+    processor = CreditDataProcessor('/Users/felip/PycharmProjects/scripts/Machine/basededados/credit_data.csv')
     #Carregar os dados
     processor.load_data()
     #preprocessar os dados

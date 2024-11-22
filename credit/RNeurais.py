@@ -61,7 +61,7 @@ class RedeNeuralCredit:
         pass
 
 if __name__ == "__main__":
-    model_path = '/Users/felip/PycharmProjects/Machine/credit/credit.pkl'
+    model_path = '/Users/felip/PycharmProjects/scripts/Machine/credit/credit.pkl'
     credit_nn = RedeNeuralCredit(model_path)
 
     # Treinar e avaliar o modelo

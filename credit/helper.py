@@ -1,8 +1,6 @@
 from sklearn.neural_network import MLPClassifier
-import pickle
-from sklearn.metrics import accuracy_score, classification_report
 import pandas as pd
-import numpy as np
+import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 import pickle
 from sklearn.model_selection import cross_val_score
@@ -23,8 +21,8 @@ class CreditDataProcessor1:
 
     def cria_rn(self):
         self.rede_neural = MLPClassifier(
-            max_iter=5000, verbose=True, tol=1e-5,  # Aumentar max_iter para garantir mais iterações
-            solver='adam', activation='relu', hidden_layer_sizes=(20, 20)
+            max_iter=1500, verbose=True, tol=1e-5,  # Aumentar max_iter para garantir mais iterações
+            solver='adam', activation='relu', hidden_layer_sizes=(20, 20), alpha=0.001, random_state=42
         )
         self._load_data()
 
@@ -53,7 +51,48 @@ class CreditDataProcessor1:
         #print("Média da acurácia com validação cruzada:", scores.mean())
         predictions = self.rede_neural.predict(self.x_credit)
         print(predictions)
+        self.plot_class_distribution_by_age(predictions)
+        self.plot_scatter_age_vs_income(predictions)
+        self.plot_histogram_of_predictions(predictions)
 
+    def plot_class_distribution_by_age(self, predictions):
+        # Gráfico de Contagem das Classes por Faixa Etária
+        self.base_credit['predictions'] = predictions
+        self.base_credit['age'] = self.base_credit['age'].astype(int)  # Converte a idade para inteiro
+        bins = [18, 30, 40, 50, 60, 100]  # Define as faixas de idade
+        labels = ['18-30', '30-40', '40-50', '50-60', '60+']
+
+        # Adiciona uma coluna para a faixa etária
+        self.base_credit['age_group'] = pd.cut(self.base_credit['age'], bins=bins, labels=labels, right=False)
+
+        # Conta o número de vezes que cada classe ocorre em cada faixa etária
+        plt.figure(figsize=(10, 6))
+        self.base_credit.groupby(['age_group', 'predictions'], observed=False).size().unstack().plot(kind='bar', stacked=True)
+        plt.title('Distribuição das Previsões por Faixa Etária')
+        plt.xlabel('Faixa Etária')
+        plt.ylabel('Contagem das Previsões')
+        plt.xticks(rotation=45)
+
+        plt.show()
+
+
+    def plot_scatter_age_vs_income(self, predictions):
+        self.base_credit['predictions'] = predictions
+        plt.figure(figsize=(10, 6))
+        sns.scatterplot(x='age', y='income', hue='predictions', data=self.base_credit, palette='Set1')
+        plt.title('Dispersão entre Idade e Renda com as Previsões')
+        plt.xlabel('Idade')
+        plt.ylabel('Renda')
+        plt.show()
+
+    def plot_histogram_of_predictions(self, predictions):
+        self.base_credit['predictions'] = predictions
+        plt.figure(figsize=(10, 6))
+        sns.histplot(self.base_credit['predictions'], kde=False, bins=10, color='skyblue')
+        plt.title('Distribuição das Classes Preditivas')
+        plt.xlabel('Classe Preditiva')
+        plt.ylabel('Frequência')
+        plt.show()
 
 
 if __name__ == "__main__":
