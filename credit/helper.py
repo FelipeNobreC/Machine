@@ -54,6 +54,8 @@ class CreditDataProcessor1:
         self.plot_class_distribution_by_age(predictions)
         self.plot_scatter_age_vs_income(predictions)
         self.plot_histogram_of_predictions(predictions)
+        self.plot_pie_chart_age_vs_predictions(predictions)
+
 
     def plot_class_distribution_by_age(self, predictions):
         # Gráfico de Contagem das Classes por Faixa Etária
@@ -93,6 +95,30 @@ class CreditDataProcessor1:
         plt.xlabel('Classe Preditiva')
         plt.ylabel('Frequência')
         plt.show()
+
+    def plot_pie_chart_age_vs_predictions(self, predictions):
+        # Adiciona as previsões ao dataframe
+        self.base_credit['predictions'] = predictions
+
+        # Converte a idade para inteiro e define as faixas etárias
+        self.base_credit['age'] = self.base_credit['age'].astype(int)
+        bins = [18, 30, 40, 50, 60, 100]
+        labels = ['18-30', '30-40', '40-50', '50-60', '60+']
+        self.base_credit['age_group'] = pd.cut(self.base_credit['age'], bins=bins, labels=labels, right=False)
+
+        # Conta a frequência de cada faixa etária para cada classe predita
+        age_group_distribution = self.base_credit.groupby('age_group', observed=False)['predictions'].value_counts(
+            normalize=True).unstack()
+
+        # Para cada classe predita, cria um gráfico de pizza
+        for pred_class in age_group_distribution.columns:
+            plt.figure(figsize=(8, 8))
+            data = age_group_distribution[pred_class].dropna() * 100  # Converte para porcentagem
+            data.plot(kind='pie', autopct='%1.1f%%', startangle=90, colormap='tab20c')
+            plt.title(f'Proporção da Classe Preditiva {pred_class} por Faixa Etária')
+            plt.ylabel('')  # Remove o label da coluna
+            plt.show()
+
 
 
 if __name__ == "__main__":
